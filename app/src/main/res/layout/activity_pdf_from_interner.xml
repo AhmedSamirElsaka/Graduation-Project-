@@ -34,6 +34,7 @@
         app:layout_constraintVertical_bias="0.0"
         android:layout_marginTop="8dp"
         android:hint="online pdf link"
+        android:textColor="#000"
         android:textColorHint="#7E000000"
         android:layout_marginHorizontal="16dp"/>
 

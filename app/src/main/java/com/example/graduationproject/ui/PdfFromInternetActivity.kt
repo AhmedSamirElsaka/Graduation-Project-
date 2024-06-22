@@ -3,15 +3,15 @@ package com.example.graduationproject.ui
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.graduationproject.databinding.ActivityPdfFromInternerBinding
-import com.example.graduationproject.ui.util.saveTo
+import com.example.graduationproject.databinding.ActivityPdfFromInternetBinding
+import com.example.graduationproject.utilities.saveTo
 
-class PdfFromInternerActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityPdfFromInternerBinding
+class PdfFromInternetActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityPdfFromInternetBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPdfFromInternerBinding.inflate(layoutInflater)
+        binding = ActivityPdfFromInternetBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 

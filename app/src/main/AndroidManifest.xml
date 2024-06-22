@@ -22,7 +22,7 @@
         android:theme="@style/Theme.GraduationProject"
         tools:targetApi="31">
         <activity
-            android:name=".ui.PdfFromInternerActivity"
+            android:name=".ui.PdfFromInternetActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MainActivity"

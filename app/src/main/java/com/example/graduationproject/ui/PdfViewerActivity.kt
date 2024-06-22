@@ -23,12 +23,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.ActivityPdfViewerBinding
-import com.example.graduationproject.ui.util.FileUtils.createPdfDocumentUri
-import com.example.graduationproject.ui.util.FileUtils.fileFromAsset
-import com.example.graduationproject.ui.util.FileUtils.uriToFile
-import com.example.graduationproject.ui.util.NetworkUtil.checkInternetConnection
-import com.example.graduationproject.ui.util.PdfEngine
-import com.example.graduationproject.ui.util.saveTo
+import com.example.graduationproject.utilities.FileUtils.createPdfDocumentUri
+import com.example.graduationproject.utilities.FileUtils.fileFromAsset
+import com.example.graduationproject.utilities.FileUtils.uriToFile
+import com.example.graduationproject.utilities.NetworkUtil.checkInternetConnection
+import com.example.graduationproject.utilities.PdfEngine
+import com.example.graduationproject.utilities.saveTo
 import java.io.File
 
 /**
@@ -78,7 +78,7 @@ class PdfViewerActivity : AppCompatActivity() {
             intent.putExtra(ENABLE_FILE_DOWNLOAD, enableDownload)
             intent.putExtra("headers", HeaderData(headers))
             isPDFFromPath = false
-            SAVE_TO_DOWNLOADS = saveTo == com.example.graduationproject.ui.util.saveTo.DOWNLOADS
+            SAVE_TO_DOWNLOADS = saveTo == com.example.graduationproject.utilities.saveTo.DOWNLOADS
             return intent
         }
 
@@ -95,7 +95,7 @@ class PdfViewerActivity : AppCompatActivity() {
             intent.putExtra(ENABLE_FILE_DOWNLOAD, false)
             intent.putExtra(FROM_ASSETS, fromAssets)
             isPDFFromPath = true
-            SAVE_TO_DOWNLOADS = saveTo == com.example.graduationproject.ui.util.saveTo.DOWNLOADS
+            SAVE_TO_DOWNLOADS = saveTo == com.example.graduationproject.utilities.saveTo.DOWNLOADS
 
             return intent
         }
@@ -111,6 +111,7 @@ class PdfViewerActivity : AppCompatActivity() {
                 FILE_TITLE,
                 "Graduation Project",
             )
+
 
         // Configure progress bar and background
         val typedArray1 = theme.obtainStyledAttributes(R.styleable.PdfRendererView)

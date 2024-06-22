@@ -1,4 +1,4 @@
-package com.example.graduationproject.ui.util
+package com.example.graduationproject.utilities
 
 /**
  * Created by Rajat on 11,July,2020

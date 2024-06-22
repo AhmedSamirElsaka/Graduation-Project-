@@ -10,10 +10,10 @@ import android.content.Context
     import android.os.ParcelFileDescriptor
     import android.util.Log
     import android.util.Size
-    import com.example.graduationproject.ui.util.CacheManager
-    import com.example.graduationproject.ui.util.CacheManager.Companion.CACHE_PATH
-import com.example.graduationproject.ui.util.CommonUtils
-import com.example.graduationproject.ui.util.CommonUtils.Companion.calculateDynamicPrefetchCount
+    import com.example.graduationproject.utilities.CacheManager
+    import com.example.graduationproject.utilities.CacheManager.Companion.CACHE_PATH
+import com.example.graduationproject.utilities.CommonUtils
+import com.example.graduationproject.utilities.CommonUtils.Companion.calculateDynamicPrefetchCount
 import kotlinx.coroutines.CoroutineScope
     import kotlinx.coroutines.Dispatchers
     import kotlinx.coroutines.launch
@@ -112,9 +112,6 @@ import kotlinx.coroutines.CoroutineScope
                         }
                     }
                 }
-        }
-        private fun openPdfFile(fileDescriptor: ParcelFileDescriptor) {
-            pdfRenderer = PdfRenderer(fileDescriptor)
         }
 
         fun getPageCount(): Int {

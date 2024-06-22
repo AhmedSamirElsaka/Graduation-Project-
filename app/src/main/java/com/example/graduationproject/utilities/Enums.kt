@@ -1,4 +1,4 @@
-package com.example.graduationproject.ui.util
+package com.example.graduationproject.utilities
 
 sealed class DownloadStatus {
     object Started : DownloadStatus()

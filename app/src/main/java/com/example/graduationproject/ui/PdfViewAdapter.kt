@@ -10,7 +10,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.LinearInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.example.graduationproject.databinding.ListItemPdfPageBinding
-import com.example.graduationproject.ui.util.CommonUtils
+import com.example.graduationproject.utilities.CommonUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -277,77 +277,7 @@ internal class PdfViewAdapter(
     }
 
     inner class PdfPageViewHolder(private val itemBinding: ListItemPdfPageBinding) : RecyclerView.ViewHolder(itemBinding.root) {
-//        fun bind(position: Int) {
-////            with(itemBinding) {
-////                handleLoadingForPage(position)
-////                if (pageView.width == 0 || pageView.height == 0) {
-////                    pageView.post { bind(position) }  // Delay the binding if the layout isn't ready.
-////                    return
-////                }
-////
-////                val pageDimensions = renderer.getPageDimensions(position)
-////                val aspectRatio = pageDimensions.width.toFloat() / pageDimensions.height.toFloat()
-////                val width = pageView.width
-////                val height = (width / aspectRatio).toInt()
-////
-////                // Use cached or dynamically calculated height here as per your original logic.
-////                val bitmap = CommonUtils.Companion.BitmapPool.getBitmap(width, height)
-////                updateLayoutParams(height)
-////
-////                renderer.renderPage(position, bitmap) { success, pageNo, renderedBitmap ->
-////                    if (success && pageNo == position) {
-////                        CoroutineScope(Dispatchers.Main).launch {
-////                            itemBinding.pageView.setImageBitmap(renderedBitmap ?: bitmap)
-////                            applyFadeInAnimation(pageView)
-////                            pageLoadingLayout.pdfViewPageLoadingProgress.visibility = View.GONE
-////                        }
-////                    } else {
-////                        CommonUtils.Companion.BitmapPool.recycleBitmap(bitmap)
-////                    }
-////                }
-////            }
-//
-//            with(itemBinding) {
-//                // Show a placeholder or loading indicator
-//                pageLoadingLayout.pdfViewPageLoadingProgress.visibility = View.VISIBLE
-//
-//                // Fetch dimensions asynchronously
-//                renderer.getPageDimensionsAsync(position) { size ->
-//                    val aspectRatio = size.width.toFloat() / size.height.toFloat()
-//                    val width = pageView.width
-//                    val height = (width / aspectRatio).toInt()
-//
-//                    // Update layout params based on the actual page size
-//                    updateLayoutParams(height)
-//
-//                    // Now load the actual page
-//                    val bitmap = CommonUtils.Companion.BitmapPool.getBitmap(width, height)
-//                    renderer.renderPage(position, bitmap) { success, pageNo, renderedBitmap ->
-//                        if (success && pageNo == position) {
-//                            pageView.setImageBitmap(renderedBitmap ?: bitmap)
-//                            applyFadeInAnimation(pageView)
-//                            pageLoadingLayout.pdfViewPageLoadingProgress.visibility = View.GONE
-//                        } else {
-//                            CommonUtils.Companion.BitmapPool.recycleBitmap(bitmap)
-//                        }
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        private fun ListItemPdfPageBinding.updateLayoutParams(height: Int) {
-//            root.layoutParams.height = height
-//            (root.layoutParams as? ViewGroup.MarginLayoutParams)?.setMargins(
-//                pageSpacing.left, pageSpacing.top, pageSpacing.right, pageSpacing.bottom
-//            )
-//        }
-
-
         fun bind(position: Int) {
-
-
-            Log.i("bind", "" + position )
             with(itemBinding) {
                 pageLoadingLayout.pdfViewPageLoadingProgress.visibility = if (enableLoadingForPages) View.VISIBLE else View.GONE
 

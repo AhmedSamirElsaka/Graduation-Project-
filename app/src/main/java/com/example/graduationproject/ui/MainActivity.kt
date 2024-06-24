@@ -6,12 +6,17 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.navigation.fragment.NavHostFragment
+import com.example.graduationproject.R
 import com.example.graduationproject.databinding.ActivityMainBinding
 import com.example.graduationproject.utilities.saveTo
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+@AndroidEntryPoint
+class MainActivity @Inject constructor() : AppCompatActivity() {
+     lateinit var binding: ActivityMainBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +24,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+//        val navController = navHostFragment.navController
 
         binding.onlinePdf.setOnClickListener {
 
@@ -38,6 +46,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+fun returnBinding():ActivityMainBinding {
+    return binding
+}
 
 
     private val filePicker =

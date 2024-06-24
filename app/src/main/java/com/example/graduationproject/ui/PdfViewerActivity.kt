@@ -31,9 +31,7 @@ import com.example.graduationproject.utilities.PdfEngine
 import com.example.graduationproject.utilities.saveTo
 import java.io.File
 
-/**
- * Created by Rajat on 11,July,2020
- */
+
 
 class PdfViewerActivity : AppCompatActivity() {
 

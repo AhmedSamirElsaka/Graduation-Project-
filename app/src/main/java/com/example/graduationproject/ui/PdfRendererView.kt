@@ -155,6 +155,7 @@ class PdfRendererView @JvmOverloads constructor(
             adapter = pdfViewAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
+
             if (showDivider) {
                 DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
                     divider?.let { setDrawable(it) }

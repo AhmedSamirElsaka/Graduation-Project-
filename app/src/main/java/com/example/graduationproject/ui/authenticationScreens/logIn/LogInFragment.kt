@@ -52,7 +52,10 @@ class LogInFragment : BaseFragment<FragmentLogInBinding>() {
                 ( activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
             }
             LogInUiEvent.LogInWithGoogleEvent -> signInClient.signInIntent.also { startActivityForResult(it, GOOGLE_ACCOUNT_REQUEST) }
-            LogInUiEvent.SignUpEvent -> findNavController().navigate(R.id.action_logInFragment_to_signUpFragment)
+            LogInUiEvent.SignUpEvent -> {
+                ( activity as MainActivity).binding.mainGroup.visibility = View.VISIBLE
+                ( activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
+            }
             LogInUiEvent.LogInWithPhoneEvent -> findNavController().navigate(R.id.action_logInFragment_to_phoneFragment)
         }
     }

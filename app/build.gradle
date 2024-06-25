@@ -100,4 +100,9 @@ dependencies {
     //intui
     implementation 'com.intuit.sdp:sdp-android:1.1.0'
     implementation 'com.intuit.ssp:ssp-android:1.1.0'
+
+
+    //TextRecognizer
+    implementation 'com.google.android.gms:play-services-vision:20.1.3'
+
 }

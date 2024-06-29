@@ -2,18 +2,20 @@ package com.example.graduationproject.ui
 
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.Color
 import android.graphics.pdf.PdfRenderer
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.util.Size
 import com.example.graduationproject.utilities.CacheManager
 import com.example.graduationproject.utilities.CacheManager.Companion.CACHE_PATH
-import com.example.graduationproject.utilities.CommonUtils
-import com.example.graduationproject.utilities.CommonUtils.Companion.calculateDynamicPrefetchCount
+import com.example.graduationproject.utilities.SHARED_PREFERNCES_KEY
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextRecognizer
 import kotlinx.coroutines.CoroutineScope
@@ -24,24 +26,25 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 
 internal class PdfRendererCore(
-    private val context: Context,
-    fileDescriptor: ParcelFileDescriptor
-) {
+    private val context: Context, fileDescriptor: ParcelFileDescriptor
+) : TextToSpeech.OnInitListener {
 
     private var isRendererOpen = false
+    private lateinit var sharedPreferences: SharedPreferences
 
     constructor(context: Context, file: File) : this(
-        context = context,
-        fileDescriptor = getFileDescriptor(file)
+        context = context, fileDescriptor = getFileDescriptor(file)
     )
 
     private val openPages = ConcurrentHashMap<Int, PdfRenderer.Page>()
     private var pdfRenderer: PdfRenderer? = null
     private val cacheManager = CacheManager(context)
+    private lateinit var textToSpeech: TextToSpeech
 
     companion object {
 
@@ -72,10 +75,13 @@ internal class PdfRendererCore(
     init {
         pdfRenderer = PdfRenderer(fileDescriptor).also { isRendererOpen = true }
         cacheManager.initCache()
+
+        textToSpeech = TextToSpeech(context, this)
+        sharedPreferences = context.getSharedPreferences(SHARED_PREFERNCES_KEY, MODE_PRIVATE)
+
     }
 
-    internal fun getBitmapFromCache(pageNo: Int): Bitmap? =
-        cacheManager.getBitmapFromCache(pageNo)
+    internal fun getBitmapFromCache(pageNo: Int): Bitmap? = cacheManager.getBitmapFromCache(pageNo)
 
     private fun addBitmapToMemoryCache(pageNo: Int, bitmap: Bitmap) =
         cacheManager.addBitmapToCache(pageNo, bitmap)
@@ -94,8 +100,7 @@ internal class PdfRendererCore(
         }
     }
 
-    fun pageExistInCache(pageNo: Int): Boolean =
-        cacheManager.pageExistsInCache(pageNo)
+    fun pageExistInCache(pageNo: Int): Boolean = cacheManager.pageExistsInCache(pageNo)
 
     fun getPageCount(): Int {
         synchronized(this) {
@@ -117,9 +122,7 @@ internal class PdfRendererCore(
         if (cachedBitmap != null) {
             CoroutineScope(Dispatchers.Main).launch {
                 onBitmapReady?.invoke(
-                    true,
-                    pageNo,
-                    cachedBitmap
+                    true, pageNo, cachedBitmap
                 )
             }
             return
@@ -132,21 +135,20 @@ internal class PdfRendererCore(
                         bitmap.eraseColor(Color.WHITE) // Clear the bitmap with white color
                         pdfPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                         addBitmapToMemoryCache(pageNo, bitmap)
-                        CoroutineScope(Dispatchers.IO).launch { writeBitmapToCache(pageNo, bitmap) }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            writeBitmapToCache(pageNo, bitmap)
+                            convertBitmapToText(bitmap, pageNo)
+                        }
+
                         CoroutineScope(Dispatchers.Main).launch {
                             onBitmapReady?.invoke(
-                                true,
-                                pageNo,
-                                bitmap
+                                true, pageNo, bitmap
                             )
-                            convertBitmapToText(bitmap)
                         }
                     } catch (e: Exception) {
                         CoroutineScope(Dispatchers.Main).launch {
                             onBitmapReady?.invoke(
-                                false,
-                                pageNo,
-                                null
+                                false, pageNo, null
                             )
                         }
                     }
@@ -155,11 +157,12 @@ internal class PdfRendererCore(
         }
     }
 
-    fun convertBitmapToText(bitmap: Bitmap) {
+
+    private fun convertBitmapToText(bitmap: Bitmap, pageNo: Int) {
         val textRecognizer = TextRecognizer.Builder(context).build()
-        val imageFrame = Frame.Builder()
-            .setBitmap(bitmap) // Replace 'bitmap' with your image bitmap
-            .build()
+        val imageFrame =
+            Frame.Builder().setBitmap(bitmap) // Replace 'bitmap' with your image bitmap
+                .build()
 
         var imageText = "Extracted text"
         val textBlocks = textRecognizer.detect(imageFrame)
@@ -167,9 +170,31 @@ internal class PdfRendererCore(
         for (i in 0 until textBlocks.size()) {
             val textBlock = textBlocks.get(textBlocks.keyAt(i))
             imageText = textBlock.value // Extracted text
-            Log.i("hello", imageText)
         }
+        if (pageNo % 2 == 1 && pageNo != 1) {
+            var count = pageNo - 1
+            while (count != pageNo - 4) {
+                deleteTextFromSharedPreference(count)
+                Log.i("hello2", "delete $count")
+                count--
+            }
+        }
+        saveTextToSharedPreference(imageText, pageNo)
     }
+
+    private fun saveTextToSharedPreference(text: String, pageNo: Int) {
+        val editor = sharedPreferences.edit()
+        editor.putString("page${pageNo}", text)
+        Log.i("hello2", "save $pageNo")
+        editor.apply()
+    }
+
+    private fun deleteTextFromSharedPreference(pageNo: Int) {
+        val editor = sharedPreferences.edit()
+        editor.remove("page${pageNo}")
+        editor.apply()
+    }
+
 
     private suspend fun <T> withPdfPage(pageNo: Int, block: (PdfRenderer.Page) -> T): T? =
         withContext(Dispatchers.IO) {
@@ -233,6 +258,22 @@ internal class PdfRendererCore(
                 isRendererOpen = false
             }
             cacheManager.clearCache()
+        }
+    }
+
+    private fun speak(text: String) {
+        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = textToSpeech.setLanguage(Locale.ENGLISH)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                // Handle the error
+            } else {
+            }
+        } else {
+            // Handle the initialization failure
         }
     }
 

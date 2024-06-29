@@ -5,8 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.graduationproject.domain.entity.AuthenticationState
 import com.example.graduationproject.domain.usecases.RegisterUsingPhoneNumberUseCase
-import com.example.graduationproject.ui.authenticationScreens.phoneAuthentication.otp.OtpUiEvent
-import com.example.graduationproject.ui.authenticationScreens.phoneAuthentication.otp.OtpUiState
 import com.example.graduationproject.ui.base.BaseViewModel
 import com.example.straterproject.utilities.Event
 import com.example.straterproject.utilities.InputValidator
@@ -35,7 +33,7 @@ class OtpViewModel @Inject constructor(
 
     init {
         storedVerificationId = savedStateHandle.get<String>("verificationId") ?: ""
-     }
+    }
 
     fun onOtpInputChange(text: CharSequence) {
         _otpUIState.update {
@@ -71,7 +69,7 @@ class OtpViewModel @Inject constructor(
             }
         }
 
-       }
+    }
 
 
 

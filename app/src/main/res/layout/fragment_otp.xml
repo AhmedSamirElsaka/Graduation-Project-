@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color">
+        android:background="@color/black">
 
         <ImageView
             android:id="@+id/imageView"
@@ -29,7 +29,7 @@
             android:layout_marginTop="@dimen/spacing_large"
             android:fontFamily="@font/plus_jakarta_sans_semibold"
             android:text="Enter \nOTP Code "
-            android:textColor="@color/shade_primary_color"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView"
@@ -44,7 +44,7 @@
             android:layout_marginHorizontal="@dimen/spacing_extra_large"
             android:textAlignment="center"
             android:text="A 6-digit has been sent to you"
-            android:textColor="@color/shade_secondary_color"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textView" />
@@ -66,11 +66,11 @@
                 android:id="@+id/otp"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:afterTextChanged="@{(text) -> viewmodel.onOtpInputChange(text)}"
                 android:inputType="textPersonName"
                 android:maxLines="1"
                 android:text="@{viewmodel.otpUIState.otp}"
-                android:afterTextChanged="@{(text) -> viewmodel.onOtpInputChange(text)}"
-                android:textColor="@color/shade_secondary_color"
+                android:textColor="@color/white"
 
                 />
         </com.google.android.material.textfield.TextInputLayout>
@@ -85,6 +85,7 @@
             app:layout_constraintStart_toStartOf="@+id/password_two_layout"
             app:layout_constraintTop_toBottomOf="@+id/password_two_layout"
             android:text="Verify"
+            android:backgroundTint="@color/yellow"
             app:isVisibleOrInVisible="@{!viewmodel.otpUIState.isLoading}"
             android:enabled="@{viewmodel.otpUIState.isOtpValidation}"
             android:onClick="@{()-> viewmodel.onClickVerification()}"

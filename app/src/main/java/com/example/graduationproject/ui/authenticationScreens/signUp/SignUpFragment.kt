@@ -59,7 +59,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
             if (requestCode == GOOGLE_ACCOUNT_REQUEST) {
                 val account = GoogleSignIn.getSignedInAccountFromIntent(data).result
                 account?.let {
-                    viewModel.signUpWithGoogleAccount(it)
+                    viewModel.signUpWithGoogleAccount(it , activity as MainActivity)
                 }
             }
         }

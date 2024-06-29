@@ -105,4 +105,10 @@ dependencies {
     //TextRecognizer
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
 
+
+    //JavaScript engine
+    implementation 'com.squareup.duktape:duktape-android:1.3.0'
+
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
 }

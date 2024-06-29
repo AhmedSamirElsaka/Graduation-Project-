@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.speech.tts.TextToSpeech
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -12,12 +13,12 @@ import com.example.graduationproject.R
 import com.example.graduationproject.databinding.ActivityMainBinding
 import com.example.graduationproject.utilities.saveTo
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity @Inject constructor() : AppCompatActivity() {
      lateinit var binding: ActivityMainBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +26,8 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
-//        val navController = navHostFragment.navController
+
+
 
         binding.onlinePdf.setOnClickListener {
 
@@ -42,15 +43,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
         binding.fromAssets.setOnClickListener {
             launchPdfFromAssets("quote.pdf")
         }
-
-
     }
-
-fun returnBinding():ActivityMainBinding {
-    return binding
-}
-
-
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -61,12 +54,13 @@ fun returnBinding():ActivityMainBinding {
             }
         }
 
-    fun getFileName(uri: Uri): String? {
+    private fun getFileName(uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor = contentResolver.query(uri, null, null, null, null)
             try {
-                if (cursor != null && cursor.moveToFirst()) {
+                if ((cursor != null) && cursor.moveToFirst()
+                ) {
                     result =
                         cursor.getString(cursor.run { getColumnIndex(OpenableColumns.DISPLAY_NAME) })
                 }
@@ -108,7 +102,6 @@ fun returnBinding():ActivityMainBinding {
     }
 
     private fun launchPdfFromAssets(uri: String) {
-//        var pdfTitle = getFileName(Uri(uri!!))
         startActivity(
             PdfViewerActivity.launchPdfFromPath(
                 context = this,
@@ -119,6 +112,4 @@ fun returnBinding():ActivityMainBinding {
             )
         )
     }
-
-
 }

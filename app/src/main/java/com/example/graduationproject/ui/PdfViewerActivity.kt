@@ -6,7 +6,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,7 +16,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -30,7 +28,6 @@ import com.example.graduationproject.utilities.NetworkUtil.checkInternetConnecti
 import com.example.graduationproject.utilities.PdfEngine
 import com.example.graduationproject.utilities.saveTo
 import java.io.File
-
 
 
 class PdfViewerActivity : AppCompatActivity() {
@@ -51,11 +48,12 @@ class PdfViewerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPdfViewerBinding
     private var downloadedFilePath: String? = null
 
+
     companion object {
         const val FILE_URL = "pdf_file_url"
         const val FILE_TITLE = "pdf_file_title"
         const val ENABLE_FILE_DOWNLOAD = "enable_download"
-        const val FROM_ASSETS = "from_assests"
+        const val FROM_ASSETS = "from_assets"
         var engine = PdfEngine.INTERNAL
         var enableDownload = false
         var isPDFFromPath = false
@@ -106,9 +104,9 @@ class PdfViewerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.pdfTitleTv.text = intent.extras!!.getString(
-                FILE_TITLE,
-                "Graduation Project",
-            )
+            FILE_TITLE,
+            "Graduation Project",
+        )
 
 
         // Configure progress bar and background
@@ -324,24 +322,6 @@ class PdfViewerActivity : AppCompatActivity() {
 
     private fun requestStoragePermission() {
         requestPermissionLauncher.launch(permission.WRITE_EXTERNAL_STORAGE)
-    }
-
-    private fun checkAndStartDownload() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            // For OS versions below Android 11, use the old method
-            if (ContextCompat.checkSelfPermission(
-                    this, permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                startDownload()
-            } else {
-                // Request the permission
-                requestPermissionLauncher.launch(permission.WRITE_EXTERNAL_STORAGE)
-            }
-        } else {
-            // For Android 13 and above, use scoped storage or MediaStore APIs
-            startDownload()
-        }
     }
 
     private fun startDownload() {

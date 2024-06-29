@@ -1,9 +1,12 @@
 package com.example.graduationproject.ui.authenticationScreens.signUp
 
+import android.app.Activity
+import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.example.graduationproject.domain.entity.AuthenticationState
 import com.example.graduationproject.domain.usecases.RegisterUsingGoogleAccountUseCase
 import com.example.graduationproject.domain.usecases.SignUpWithEmailAndPasswordUseCase
+import com.example.graduationproject.ui.MainActivity
 import com.example.graduationproject.ui.authenticationScreens.signUp.SignUpUiEvent
 import com.example.graduationproject.ui.authenticationScreens.signUp.SignUpUiState
 import com.example.graduationproject.ui.base.BaseViewModel
@@ -64,7 +67,7 @@ class SignUpViewModel @Inject constructor(
 
     }
 
-    fun signUpWithGoogleAccount(account: GoogleSignInAccount) = viewModelScope.launch {
+    fun signUpWithGoogleAccount(account: GoogleSignInAccount , activity: Activity) = viewModelScope.launch {
         _signUpUIState.update { it.copy(account = account) }
         _signUpUIState.update { it.copy(isLoading = true) }
         registerUsingGoogleAccountUseCase.execute(account).collectLatest {state ->
@@ -80,6 +83,10 @@ class SignUpViewModel @Inject constructor(
                 is AuthenticationState.Success -> {
                     _signUpUIState.update { it.copy(isLoading = false, isLogInSuccess = true) }
                     _signUpUIEvent.update { Event(SignUpUiEvent.SignUpEvent) }
+
+                    ( activity as MainActivity).binding.mainGroup.visibility = View.VISIBLE
+                    ( activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
+
                 }
             }
         }

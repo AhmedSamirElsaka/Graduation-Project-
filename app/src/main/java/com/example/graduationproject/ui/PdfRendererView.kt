@@ -2,25 +2,30 @@ package com.example.graduationproject.ui
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.TypedArray
-import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.Parcelable
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.SeekBar
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleObserver
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,16 +34,17 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.PdfRendererViewBinding
 import com.example.graduationproject.utilities.PdfEngine
+import com.example.graduationproject.utilities.SHARED_PREFERNCES_KEY
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileNotFoundException
+import java.util.Locale
 
-/**
- * Created by Rajat on 11,July,2020
- */
 
 class PdfRendererView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr), LifecycleObserver {
+) : FrameLayout(context, attrs, defStyleAttr), LifecycleObserver, TextToSpeech.OnInitListener {
     private lateinit var pdfRendererCore: PdfRendererCore
     private lateinit var pdfViewAdapter: PdfViewAdapter
     private var engine = PdfEngine.INTERNAL
@@ -54,6 +60,18 @@ class PdfRendererView @JvmOverloads constructor(
     private var disableScreenshots: Boolean = false
     private var postInitializationAction: (() -> Unit)? = null
     private lateinit var binding: PdfRendererViewBinding
+    private lateinit var player: ExoPlayer
+    private lateinit var textToSpeech: TextToSpeech
+    private val REQUEST_WRITE_STORAGE = 112
+    private lateinit var sharedPreferences: SharedPreferences
+    private var tts: TextToSpeech
+    private var currentPosition: Int = 0
+    private var isPaused: Boolean = false
+    var textToConvert: String? = "default text"
+//    @Inject
+//    lateinit var viewModel: MusicPlayerViewModel
+
+
     val totalPageCount: Int
         get() {
             return pdfRendererCore.getPageCount()
@@ -61,6 +79,7 @@ class PdfRendererView @JvmOverloads constructor(
 
     init {
         getAttrs(attrs, defStyleAttr)
+        tts = TextToSpeech(context, this)
     }
 
 
@@ -108,7 +127,7 @@ class PdfRendererView @JvmOverloads constructor(
     }
 
 
-    override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable {
         val superState = super.onSaveInstanceState()
         val savedState = Bundle()
         savedState.putParcelable("superState", superState)
@@ -148,13 +167,16 @@ class PdfRendererView @JvmOverloads constructor(
 
         binding = PdfRendererViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-
+        sharedPreferences = context.getSharedPreferences(
+            SHARED_PREFERNCES_KEY, Context.MODE_PRIVATE
+        )
 //        recyclerView = findViewById(R.id.recyclerView)
 //        pageNo = findViewById(R.id.pageNumber)
         binding.recyclerView.apply {
             adapter = pdfViewAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
+//            setItemViewCacheSize(1);
 
             if (showDivider) {
                 DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
@@ -164,6 +186,39 @@ class PdfRendererView @JvmOverloads constructor(
             addOnScrollListener(scrollListener)
         }
 
+        binding.playOrPause.setOnClickListener {
+            if (tts.isSpeaking) {
+                pauseSpeaking()
+                binding.playOrPause.setImageResource(R.drawable.pause)
+            } else if (isPaused) {
+                resumeSpeaking()
+                binding.playOrPause.setImageResource(R.drawable.play)
+            }
+        }
+
+        binding.forward.setOnClickListener {
+            seekForward(10)
+        }
+
+        binding.rewind.setOnClickListener {
+            seekBackward(10)
+        }
+        // Set seekbar listener
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    pauseSpeaking()
+                    currentPosition = progress
+                    resumeSpeakingFrom(currentPosition)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+
         Handler(Looper.getMainLooper()).postDelayed({
             if (restoredScrollPosition != NO_POSITION) {
                 binding.recyclerView.scrollToPosition(restoredScrollPosition)
@@ -171,9 +226,9 @@ class PdfRendererView @JvmOverloads constructor(
             }
         }, 500) // Adjust delay as needed
 
-        runnable = Runnable {
-            binding.pageNumber.pageNo.visibility = View.GONE
-        }
+//        runnable = Runnable {
+//            binding.pageNumber.pageNo.visibility = View.GONE
+//        }
 
         binding.recyclerView.post {
             postInitializationAction?.invoke()
@@ -182,6 +237,65 @@ class PdfRendererView @JvmOverloads constructor(
 
     }
 
+    private fun resumeSpeakingFrom(position: Int) {
+        if (isPaused || !tts.isSpeaking) {
+            val remainingText = textToConvert!!.substring(position)
+            speakOut(remainingText)
+        }
+    }
+
+    private fun pauseSpeaking() {
+        if (tts.isSpeaking) {
+            tts.stop()
+            isPaused = true
+        }
+    }
+
+    private fun seekForward(seconds: Int) {
+        if (tts.isSpeaking || isPaused) {
+            // Approximate average speaking rate (characters per second)
+            val avgCharsPerSecond = 15
+            currentPosition += avgCharsPerSecond * seconds
+
+            // Ensure we don't exceed the text length
+            if (currentPosition > textToConvert!!.length) {
+                currentPosition = textToConvert!!.length
+            }
+
+            val remainingText = textToConvert!!.substring(currentPosition)
+            speakOut(remainingText)
+        }
+    }
+
+    private fun seekBackward(seconds: Int) {
+        if (tts.isSpeaking || isPaused) {
+            // Approximate average speaking rate (characters per second)
+            val avgCharsPerSecond = 15
+            currentPosition -= avgCharsPerSecond * seconds
+
+            // Ensure we don't go below the start of the text
+            if (currentPosition < 0) {
+                currentPosition = 0
+            }
+
+            val remainingText = textToConvert!!.substring(currentPosition)
+            speakOut(remainingText)
+        }
+    }
+
+    private fun resumeSpeaking() {
+        if (isPaused) {
+            val remainingText = textToConvert!!.substring(currentPosition)
+            speakOut(remainingText)
+        }
+    }
+
+    private fun stopSpeaking() {
+        if (tts.isSpeaking) {
+            tts.stop()
+        }
+        isPaused = false
+    }
 
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         private var lastFirstVisiblePosition = NO_POSITION
@@ -204,6 +318,33 @@ class PdfRendererView @JvmOverloads constructor(
                 }
                 positionToUseForState = positionToUse
                 updatePageNumberDisplay(positionToUse)
+
+
+
+
+                if (positionToUse == 0 || positionToUse % 2 == 0) {
+                    Toast.makeText(
+                        context, "please wait while audio is prepared", Toast.LENGTH_LONG
+                    ).show()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        while (textToConvert.equals("default text")) {
+                            textToConvert =
+                                sharedPreferences.getString("page${positionToUse}", "default text")
+                        }
+                    }.invokeOnCompletion {
+                        Log.i("hello2", textToConvert.toString())
+                        speakOut(textToConvert!!)
+                    }
+
+                } else {
+                    textToConvert = context.getSharedPreferences(
+                        SHARED_PREFERNCES_KEY, Context.MODE_PRIVATE
+                    ).getString("page${positionToUse}", "default text")
+                }
+
+
+                speek()
+
                 lastFirstVisiblePosition = firstVisiblePosition
                 lastCompletelyVisiblePosition = firstCompletelyVisiblePosition
             } else {
@@ -217,9 +358,9 @@ class PdfRendererView @JvmOverloads constructor(
                     context.getString(R.string.pdfView_page_no, position + 1, totalPageCount)
                 binding.pageNumber.pageNo.visibility = View.VISIBLE
                 if (position == 0) {
-                    binding.pageNumber.pageNo.postDelayed({
-                        binding.pageNumber.pageNo.visibility = View.GONE
-                    }, 3000)
+//                    binding.pageNumber.pageNo.postDelayed({
+//                        binding.pageNumber.pageNo.visibility = View.GONE
+//                    }, 3000)
                 }
                 statusListener?.onPageChanged(position, totalPageCount)
             }
@@ -228,26 +369,18 @@ class PdfRendererView @JvmOverloads constructor(
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                binding.pageNumber.pageNo.postDelayed(runnable, 3000)
+//                binding.pageNumber.pageNo.postDelayed(runnable, 3000)
             } else {
-                binding.pageNumber.pageNo.removeCallbacks(runnable)
+//                binding.pageNumber.pageNo.removeCallbacks(runnable)
             }
         }
     }
 
-    fun jumpToPage(pageNumber: Int) {
-        val action = {
-            if (pageNumber in 0 until totalPageCount) {
-                binding.recyclerView.post {
-                    binding.recyclerView.scrollToPosition(pageNumber)
-                }
-            }
-        }
-        if (this::pdfRendererCore.isInitialized) {
-            action()
-        } else {
-            postInitializationAction = action
-        }
+    private fun speek() {
+        currentPosition = 0
+        binding.seekBar.max = textToConvert!!.length
+        binding.seekBar.progress = 0
+        speakOut(textToConvert!!)
     }
 
     private fun getAttrs(attrs: AttributeSet?, defStyle: Int) {
@@ -297,9 +430,54 @@ class PdfRendererView @JvmOverloads constructor(
     }
 
     fun closePdfRender() {
+        val editor = sharedPreferences.edit()
         if (pdfRendererCoreInitialised) {
             pdfRendererCore.closePdfRender()
             pdfRendererCoreInitialised = false
+            editor.clear();
+            editor.apply();
+        }
+
+        tts.stop()
+        tts.shutdown()
+    }
+
+    private fun speakOut(text: String) {
+        isPaused = false
+        val params = hashMapOf(
+            TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID to "utteranceId"
+        )
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, params)
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            // Set the language
+            val result = tts.setLanguage(Locale.ENGLISH)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                // Language data is missing or the language is not supported.
+                println("The language is not supported!")
+            }
+
+            tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {}
+
+                override fun onDone(utteranceId: String?) {}
+
+                override fun onError(utteranceId: String?) {}
+
+                override fun onRangeStart(utteranceId: String?, start: Int, end: Int, frame: Int) {
+                    if (!isPaused) {
+                        currentPosition = start
+                        binding.seekBar.progress = start
+                    }
+                }
+            })
+        } else {
+            // Initialization failed
+            println("Initialization failed!")
         }
     }
+
 }

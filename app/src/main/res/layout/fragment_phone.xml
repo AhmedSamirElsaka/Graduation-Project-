@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color">
+        android:background="@color/black">
 
         <ImageView
             android:id="@+id/imageView"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_extra_large"
              android:layout_marginTop="@dimen/spacing_medium"
-            android:textColor="@color/shade_primary_color"
+            android:textColor="@color/white"
             android:fontFamily="@font/plus_jakarta_sans_semibold"
             android:text="Continue With Your Phone"
             android:textSize="@dimen/text_large"
@@ -59,7 +59,7 @@
                 android:text="@{viewmodel.phoneUIState.phone}"
                 android:afterTextChanged="@{(text) -> viewmodel.onPhoneInputChange(text)}"
                 android:maxLines="1"
-                android:textColor="@color/shade_secondary_color"
+                android:textColor="@color/white"
 
                 />
         </com.google.android.material.textfield.TextInputLayout>
@@ -75,6 +75,7 @@
             app:layout_constraintStart_toStartOf="@+id/password_two_layout"
             app:layout_constraintTop_toBottomOf="@+id/password_two_layout"
             android:text="Confirm"
+            android:backgroundTint="@color/yellow"
             android:onClick="@{()-> viewmodel.onClickSendCodeVerification()}"
             android:enabled="@{viewmodel.phoneUIState.isPhoneValidation}"
             android:textAllCaps="false"

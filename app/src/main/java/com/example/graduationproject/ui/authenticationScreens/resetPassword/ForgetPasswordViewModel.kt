@@ -3,12 +3,10 @@ package com.example.graduationproject.ui.authenticationScreens.resetPassword
 import androidx.lifecycle.viewModelScope
 import com.example.graduationproject.domain.entity.AuthenticationState
 import com.example.graduationproject.domain.usecases.ResetPasswordUseCase
-import com.example.graduationproject.ui.authenticationScreens.resetPassword.ForgetPasswordUiEvent
-import com.example.graduationproject.ui.authenticationScreens.resetPassword.ForgetPasswordUiState
 import com.example.graduationproject.ui.base.BaseViewModel
-import com.example.straterproject.utilities.Event
-import com.example.straterproject.utilities.InputValidationState
-import com.example.straterproject.utilities.InputValidator
+import com.example.graduationproject.utilities.Event
+import com.example.graduationproject.utilities.InputValidationState
+import com.example.graduationproject.utilities.InputValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

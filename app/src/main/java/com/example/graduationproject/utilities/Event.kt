@@ -1,4 +1,4 @@
-package com.example.straterproject.utilities
+package com.example.graduationproject.utilities
 
 
 open class Event<out T>(private val content: T) {

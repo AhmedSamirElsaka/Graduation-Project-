@@ -1,4 +1,4 @@
-package com.example.straterproject.utilities
+package com.example.graduationproject.utilities
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

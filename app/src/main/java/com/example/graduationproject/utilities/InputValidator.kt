@@ -1,6 +1,4 @@
-package com.example.straterproject.utilities
-
-import com.example.graduationproject.utilities.EMAIL_REGEX
+package com.example.graduationproject.utilities
 
 
 object InputValidator {

@@ -7,7 +7,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.FragmentPhoneBinding
 import com.example.graduationproject.ui.base.BaseFragment
-import com.example.straterproject.utilities.collectLast
+import com.example.graduationproject.utilities.collectLast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider

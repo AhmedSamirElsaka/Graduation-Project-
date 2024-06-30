@@ -25,63 +25,6 @@ fun isVisibleOrGone(view: View,isVisible:Boolean) {
 
 
 
-@BindingAdapter("app:makeTextScrollable")
-fun makeTextScrollable(textView: TextView ,scrollable : Boolean) {
-    if (scrollable){
-        textView.isSelected = true
-        textView.setSingleLine()
-        textView.ellipsize= TextUtils.TruncateAt.MARQUEE
-    }
-}
-@BindingAdapter("app:setImageIsLoading")
-fun setImageIsLoading(imageView: ImageView , isByffering :Boolean) {
-    if (isByffering){
-        imageView.setImageResource(R.drawable.loading)
-    }
-}
-@BindingAdapter("app:setImagePlayOrStop")
-fun setImagePlayOrStop(imageView: ImageView , isPlay : Boolean ) {
-
-    if (isPlay){
-        imageView.setImageResource(R.drawable.pause)
-    }else{
-        imageView.setImageResource(R.drawable.play)
-    }
-}
-
-
-
-@BindingAdapter("app:isRepeatClickBackground")
-fun isRepeatClickBackground(imageView: ImageView , isRepeat :Boolean) {
-
-    if (isRepeat) imageView.setBackgroundResource(R.drawable.corner_image)
-    else   imageView.background = null
-
-}
-
-
-
-@BindingAdapter("app:setMaxProgressForSeekBar")
-fun setMaxProgressForSeekBar(seekBar: SeekBar, maxProgress : Long) {
-    seekBar.max = maxProgress.toInt()
-}
-
-@BindingAdapter("app:setCurrentProgressForSeekBar")
-fun setCurrentProgressForSeekBar(seekBar: SeekBar , progress : Long) {
-    seekBar.progress = progress.toInt()
-}
-@BindingAdapter("app:setTimeMinutes")
-fun setTimeMinutes(textView: TextView , progress : Long) {
-    textView.text = convertLongDurationToTime(progress)
-}
-
-
-
-
-
-
-
-
 
 
 

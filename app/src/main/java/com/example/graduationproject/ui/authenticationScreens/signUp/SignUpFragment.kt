@@ -12,7 +12,7 @@ import com.example.graduationproject.ui.MainActivity
 
 import com.example.graduationproject.ui.base.BaseFragment
 import com.example.graduationproject.utilities.GOOGLE_ACCOUNT_REQUEST
-import com.example.straterproject.utilities.collectLast
+import com.example.graduationproject.utilities.collectLast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.AndroidEntryPoint

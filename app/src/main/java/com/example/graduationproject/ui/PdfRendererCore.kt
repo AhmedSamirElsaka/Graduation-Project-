@@ -171,16 +171,18 @@ internal class PdfRendererCore(
             val textBlock = textBlocks.get(textBlocks.keyAt(i))
             imageText = textBlock.value // Extracted text
         }
-        if (pageNo % 2 == 1 && pageNo != 1) {
-            var count = pageNo - 1
-            while (count != pageNo - 4) {
-                deleteTextFromSharedPreference(count)
-                Log.i("hello2", "delete $count")
-                count--
-            }
-        }
+//        if (pageNo % 2 == 1 && pageNo != 1) {
+//            var count = pageNo - 1
+//            while (count != pageNo - 4) {
+//                deleteTextFromSharedPreference(count)
+//                Log.i("hello2", "delete $count")
+//                count--
+//            }
+//        }
         saveTextToSharedPreference(imageText, pageNo)
     }
+
+
 
     private fun saveTextToSharedPreference(text: String, pageNo: Int) {
         val editor = sharedPreferences.edit()
@@ -261,9 +263,6 @@ internal class PdfRendererCore(
         }
     }
 
-    private fun speak(text: String) {
-        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-    }
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {

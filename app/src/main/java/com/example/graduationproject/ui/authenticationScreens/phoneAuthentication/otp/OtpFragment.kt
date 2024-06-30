@@ -3,12 +3,11 @@ package com.example.graduationproject.ui.authenticationScreens.phoneAuthenticati
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.FragmentOtpBinding
 import com.example.graduationproject.ui.MainActivity
 import com.example.graduationproject.ui.base.BaseFragment
-import com.example.straterproject.utilities.collectLast
+import com.example.graduationproject.utilities.collectLast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

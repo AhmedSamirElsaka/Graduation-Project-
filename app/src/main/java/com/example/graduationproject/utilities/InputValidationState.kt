@@ -1,4 +1,4 @@
-package com.example.straterproject.utilities
+package com.example.graduationproject.utilities
 
 sealed class InputValidationState {
     object Valid : InputValidationState()

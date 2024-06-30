@@ -3,18 +3,15 @@ package com.example.graduationproject.ui.authenticationScreens.logIn
 import android.app.Activity.RESULT_CANCELED
 import android.content.Intent
 import android.os.Bundle
-
 import android.view.View
-
 import androidx.fragment.app.viewModels
-
 import androidx.navigation.fragment.findNavController
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.FragmentLogInBinding
 import com.example.graduationproject.ui.MainActivity
-import com.example.graduationproject.utilities.GOOGLE_ACCOUNT_REQUEST
 import com.example.graduationproject.ui.base.BaseFragment
-import com.example.straterproject.utilities.collectLast
+import com.example.graduationproject.utilities.GOOGLE_ACCOUNT_REQUEST
+import com.example.graduationproject.utilities.collectLast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
@@ -39,7 +36,7 @@ class LogInFragment : BaseFragment<FragmentLogInBinding>() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        collectLast(viewModel.loginUIEvent){
+        collectLast(viewModel.loginUIEvent) {
             it.getContentIfNotHandled()?.let { onEvent(it) }
         }
     }
@@ -48,14 +45,27 @@ class LogInFragment : BaseFragment<FragmentLogInBinding>() {
         when (event) {
             LogInUiEvent.ForgetPasswordEvent -> findNavController().navigate(R.id.action_logInFragment_to_forgetPasswordFragment)
             LogInUiEvent.LogInEvent -> {
-                ( activity as MainActivity).binding.mainGroup.visibility = View.VISIBLE
-                ( activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
+                (activity as MainActivity).binding.mainGroup.visibility = View.VISIBLE
+                (activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
             }
-            LogInUiEvent.LogInWithGoogleEvent -> signInClient.signInIntent.also { startActivityForResult(it, GOOGLE_ACCOUNT_REQUEST) }
+
+            LogInUiEvent.LogInWithGoogleEvent -> signInClient.signInIntent.also {
+                startActivityForResult(
+                    it,
+                    GOOGLE_ACCOUNT_REQUEST
+                )
+            }
+
             LogInUiEvent.SignUpEvent -> {
                 findNavController().navigate(R.id.action_logInFragment_to_signUpFragment)
             }
+
             LogInUiEvent.LogInWithPhoneEvent -> findNavController().navigate(R.id.action_logInFragment_to_phoneFragment)
+
+            LogInUiEvent.SkipUiEvent -> {
+                (activity as MainActivity).binding.mainGroup.visibility = View.VISIBLE
+                (activity as MainActivity).binding.fragmentContainerView.visibility = View.GONE
+            }
         }
     }
 
@@ -66,7 +76,7 @@ class LogInFragment : BaseFragment<FragmentLogInBinding>() {
             if (requestCode == GOOGLE_ACCOUNT_REQUEST) {
                 val account = GoogleSignIn.getSignedInAccountFromIntent(data).result
                 account?.let {
-                    viewModel.logInGoogleAccount(it , activity as MainActivity)
+                    viewModel.logInGoogleAccount(it, activity as MainActivity)
                 }
             }
         }

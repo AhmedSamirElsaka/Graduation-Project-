@@ -6,4 +6,6 @@ sealed interface LogInUiEvent {
     object LogInWithGoogleEvent: LogInUiEvent
     object LogInWithPhoneEvent: LogInUiEvent
     object SignUpEvent: LogInUiEvent
+
+    object SkipUiEvent:LogInUiEvent
 }

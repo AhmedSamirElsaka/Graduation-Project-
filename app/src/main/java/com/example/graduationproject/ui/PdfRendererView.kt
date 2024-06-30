@@ -50,7 +50,6 @@ class PdfRendererView @JvmOverloads constructor(
     private var engine = PdfEngine.INTERNAL
     private var showDivider = true
     private var divider: Drawable? = null
-    private var runnable = Runnable {}
     private var enableLoadingForPages: Boolean = false
     private var pdfRendererCoreInitialised = false
     private var pageMargin: Rect = Rect(0, 0, 0, 0)
@@ -60,16 +59,13 @@ class PdfRendererView @JvmOverloads constructor(
     private var disableScreenshots: Boolean = false
     private var postInitializationAction: (() -> Unit)? = null
     private lateinit var binding: PdfRendererViewBinding
-    private lateinit var player: ExoPlayer
-    private lateinit var textToSpeech: TextToSpeech
-    private val REQUEST_WRITE_STORAGE = 112
     private lateinit var sharedPreferences: SharedPreferences
     private var tts: TextToSpeech
     private var currentPosition: Int = 0
     private var isPaused: Boolean = false
     var textToConvert: String? = "default text"
-//    @Inject
-//    lateinit var viewModel: MusicPlayerViewModel
+    var previousText = "default text"
+
 
 
     val totalPageCount: Int
@@ -305,6 +301,7 @@ class PdfRendererView @JvmOverloads constructor(
             super.onScrolled(recyclerView, dx, dy)
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
 
+
             val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
             val firstCompletelyVisiblePosition =
                 layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -321,28 +318,29 @@ class PdfRendererView @JvmOverloads constructor(
 
 
 
-
                 if (positionToUse == 0 || positionToUse % 2 == 0) {
                     Toast.makeText(
                         context, "please wait while audio is prepared", Toast.LENGTH_LONG
                     ).show()
                     CoroutineScope(Dispatchers.IO).launch {
-                        while (textToConvert.equals("default text")) {
+                        while (textToConvert.equals("default text") || textToConvert.equals(
+                                previousText
+                            )
+                        ) {
                             textToConvert =
                                 sharedPreferences.getString("page${positionToUse}", "default text")
                         }
                     }.invokeOnCompletion {
                         Log.i("hello2", textToConvert.toString())
                         speakOut(textToConvert!!)
+                        previousText = textToConvert.toString()
                     }
-
                 } else {
                     textToConvert = context.getSharedPreferences(
                         SHARED_PREFERNCES_KEY, Context.MODE_PRIVATE
                     ).getString("page${positionToUse}", "default text")
+                    previousText = textToConvert.toString()
                 }
-
-
                 speek()
 
                 lastFirstVisiblePosition = firstVisiblePosition

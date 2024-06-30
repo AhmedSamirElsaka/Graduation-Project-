@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.graduationproject.domain.entity.AuthenticationState
 import com.example.graduationproject.domain.usecases.RegisterUsingPhoneNumberUseCase
 import com.example.graduationproject.ui.base.BaseViewModel
-import com.example.straterproject.utilities.Event
-import com.example.straterproject.utilities.InputValidator
+import com.example.graduationproject.utilities.Event
+import com.example.graduationproject.utilities.InputValidator
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel

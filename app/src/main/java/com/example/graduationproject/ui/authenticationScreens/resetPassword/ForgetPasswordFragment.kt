@@ -8,7 +8,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.graduationproject.R
 import com.example.graduationproject.databinding.FragmentForgetPasswordBinding
 import com.example.graduationproject.ui.base.BaseFragment
-import com.example.straterproject.utilities.collectLast
+import com.example.graduationproject.utilities.collectLast
 import dagger.hilt.android.AndroidEntryPoint
 
 

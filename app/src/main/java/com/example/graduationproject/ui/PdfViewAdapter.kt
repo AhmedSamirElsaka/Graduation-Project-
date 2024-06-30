@@ -15,10 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/**
- * Created by Rajat on 11,July,2020
- */
-
 internal class PdfViewAdapter(
     private val context: Context,
     private val renderer: PdfRendererCore,

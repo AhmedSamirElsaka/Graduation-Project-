@@ -47,20 +47,6 @@ object FileUtils {
         }
         return tempFile
     }
-
-    @Throws(IOException::class)
-    fun downloadFile(context: Context, assetName: String, filePath: String, fileName: String?){
-
-       val dirPath = "${Environment.getExternalStorageDirectory()}/${filePath}"
-        val outFile = File(dirPath)
-        //Create New File if not present
-        if (!outFile.exists()) {
-            outFile.mkdirs()
-        }
-        val outFile1 = File(dirPath, "/$fileName.pdf")
-        copy(context.assets.open(assetName), outFile1)
-    }
-
     fun createPdfDocumentUri(contentResolver: ContentResolver, fileName: String): Uri {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)

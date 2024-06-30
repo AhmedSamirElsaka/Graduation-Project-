@@ -7,12 +7,10 @@ import com.example.graduationproject.domain.entity.AuthenticationState
 import com.example.graduationproject.domain.usecases.RegisterUsingGoogleAccountUseCase
 import com.example.graduationproject.domain.usecases.SignUpWithEmailAndPasswordUseCase
 import com.example.graduationproject.ui.MainActivity
-import com.example.graduationproject.ui.authenticationScreens.signUp.SignUpUiEvent
-import com.example.graduationproject.ui.authenticationScreens.signUp.SignUpUiState
 import com.example.graduationproject.ui.base.BaseViewModel
-import com.example.straterproject.utilities.Event
-import com.example.straterproject.utilities.InputValidationState
-import com.example.straterproject.utilities.InputValidator
+import com.example.graduationproject.utilities.Event
+import com.example.graduationproject.utilities.InputValidationState
+import com.example.graduationproject.utilities.InputValidator
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

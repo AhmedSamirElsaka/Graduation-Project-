@@ -1,8 +1,8 @@
 package com.example.graduationproject.ui.authenticationScreens.phoneAuthentication.phone
 
 import com.example.graduationproject.ui.base.BaseViewModel
-import com.example.straterproject.utilities.Event
-import com.example.straterproject.utilities.InputValidator
+import com.example.graduationproject.utilities.Event
+import com.example.graduationproject.utilities.InputValidator
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
